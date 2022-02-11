@@ -8,6 +8,7 @@ type LogEntry struct {
 	Timestamp   time.Time
 	Hostname    string
 	Application string
+	Level       int
 	Message     string
 }
 

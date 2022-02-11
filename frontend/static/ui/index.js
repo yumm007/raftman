@@ -43,6 +43,7 @@ webix.ready(function () {
                             {id: "Timestamp", header: "Timestamp", width: 175, format: tsFormatter},
                             {id: "Hostname", header: "Hostname", width: 150},
                             {id: "Application", header: "Application", width: 150},
+                            {id: "Level", header: "Level", width: 50},
                             {id: "Message", header: "Message", fillspace: true}
                         ],
                         data: []
@@ -131,6 +132,7 @@ webix.ready(function () {
             }
             queryList.adjustColumn("Timestamp");
             queryList.adjustColumn("Hostname");
+            queryList.adjustColumn("Level");
             queryList.adjustColumn("Application");
             if (data.Entries) {
                 queryList.showItemByIndex(data.Entries.length);

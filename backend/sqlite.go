@@ -83,7 +83,7 @@ func (b *sqliteBackend) Start() error {
 		return err
 	}
 
-	_, err = db.Exec("CREATE VIRTUAL TABLE IF NOT EXISTS logb USING FTS4(msg, tokenize=unicode61)")
+	_, err = db.Exec("CREATE VIRTUAL TABLE IF NOT EXISTS logb USING FTS4(level integer , msg, tokenize=unicode61)")
 	if err != nil {
 		db.Close()
 		return err
@@ -96,7 +96,7 @@ func (b *sqliteBackend) Start() error {
 	}
 	b.hStmt = hStmt
 
-	bStmt, err := db.Prepare("INSERT INTO logb (docid, msg) VALUES (LAST_INSERT_ROWID(), ?)")
+	bStmt, err := db.Prepare("INSERT INTO logb (docid, level, msg) VALUES (LAST_INSERT_ROWID(), ?, ?)")
 	if err != nil {
 		hStmt.Close()
 		db.Close()
@@ -226,7 +226,7 @@ func (b *sqliteBackend) insertEntry(tx *sql.Tx, e *api.LogEntry) error {
 	if _, err := tx.Stmt(b.hStmt).Exec(e.Timestamp, e.Hostname, e.Application); err != nil {
 		return err
 	}
-	if _, err := tx.Stmt(b.bStmt).Exec(e.Message); err != nil {
+	if _, err := tx.Stmt(b.bStmt).Exec(e.Level, e.Message); err != nil {
 		return err
 	}
 	return nil
@@ -329,7 +329,7 @@ func (b *sqliteBackend) handleQueryList(m *queryListM) {
 	args := []interface{}{}
 
 	sqlBuf := &bytes.Buffer{}
-	fmt.Fprint(sqlBuf, "SELECT h.ts, h.host, h.app, b.msg ")
+	fmt.Fprint(sqlBuf, "SELECT h.ts, h.host, h.app, b.level, b.msg ")
 	b.buildQueryFromAndWhere(m.req, sqlBuf, &args)
 	fmt.Fprint(sqlBuf, "ORDER BY h.ts DESC ")
 	b.buildQueryLimit(m.req, sqlBuf, &args)
@@ -347,7 +347,7 @@ func (b *sqliteBackend) handleQueryList(m *queryListM) {
 	entries := make([]*api.LogEntry, 0, clamp(0, m.req.Limit, 500))
 	for rows.Next() {
 		entry := api.LogEntry{}
-		err = rows.Scan(&entry.Timestamp, &entry.Hostname, &entry.Application, &entry.Message)
+		err = rows.Scan(&entry.Timestamp, &entry.Hostname, &entry.Application, &entry.Level, &entry.Message)
 		if err != nil {
 			res.Error = err.Error()
 			m.res <- &res

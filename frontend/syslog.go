@@ -125,6 +125,9 @@ func (f *syslogServerFrontend) toLogEntry(logParts format.LogParts) *api.LogEntr
 		if val, ok := logParts["tag"].(string); ok {
 			e.Application = val
 		}
+		if val, ok := logParts["severity"].(int); ok {
+			e.Level = val
+		}
 		if val, ok := logParts["content"].(string); ok {
 			e.Message = val
 		}
@@ -139,6 +142,9 @@ func (f *syslogServerFrontend) toLogEntry(logParts format.LogParts) *api.LogEntr
 		}
 		if val, ok := logParts["app_name"].(string); ok {
 			e.Application = val
+		}
+		if val, ok := logParts["severity"].(int); ok {
+			e.Level = val
 		}
 		if val, ok := logParts["message"].(string); ok {
 			e.Message = val

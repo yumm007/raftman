@@ -20,16 +20,16 @@ func main() {
 	flag.Parse()
 
 	if len(backendArgs) == 0 {
-		backendArgs = append(backendArgs, mustParseURL("sqlite:///var/lib/raftman/logs.db"))
+		backendArgs = append(backendArgs, mustParseURL("sqlite:///Users/yumm/temp/logs.db"))
 	} else if len(backendArgs) > 1 {
 		log.Fatal("At most one backend must be defined")
 	}
 
 	if len(frontendArgs) == 0 {
-		frontendArgs = append(frontendArgs, mustParseURL("syslog+udp://:514"))
-		frontendArgs = append(frontendArgs, mustParseURL("syslog+tcp://:5514"))
-		frontendArgs = append(frontendArgs, mustParseURL("api+http://:8181/api/"))
-		frontendArgs = append(frontendArgs, mustParseURL("ui+http://:8282/"))
+		frontendArgs = append(frontendArgs, mustParseURL("syslog+udp://:5513"))
+		frontendArgs = append(frontendArgs, mustParseURL("syslog+tcp://:5515"))
+		frontendArgs = append(frontendArgs, mustParseURL("api+http://:18181/api/"))
+		frontendArgs = append(frontendArgs, mustParseURL("ui+http://:18282/"))
 	}
 
 	e, err := engine.NewEngine(backendArgs[0], frontendArgs)
