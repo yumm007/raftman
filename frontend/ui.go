@@ -1,10 +1,10 @@
 package frontend
 
 import (
+	"embed"
 	"github.com/pierredavidbelanger/raftman/spi"
 	"net/http"
 	"net/url"
-	"os"
 )
 
 type uiFrontend struct {
@@ -21,17 +21,28 @@ func newUIFrontend(e spi.LogEngine, frontendURL *url.URL) (*uiFrontend, error) {
 	return &f, nil
 }
 
+//go:embed static/ui static/ui/index.html
+var content embed.FS
+
 func (f *uiFrontend) Start() error {
 	_, b := f.e.GetBackend()
 	f.api.b = b
 	mux := http.NewServeMux()
 	mux.HandleFunc(f.path+"api/stat", f.api.handleStat)
 	mux.HandleFunc(f.path+"api/list", f.api.handleList)
-	var useLocal bool
-	if _, err := os.Stat("frontend/static/ui/index.html"); err == nil {
-		useLocal = true
-	}
-	mux.Handle(f.path, http.FileServer(Dir(useLocal, "/frontend/static/ui")))
+
+	mux.Handle("/static/ui/", http.FileServer(http.FS(content)))
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		var con []uint8
+		if r.RequestURI == "/" {
+			con, _ = content.ReadFile("static/ui/index.html")
+		} else {
+			con, _ = content.ReadFile("static/ui" + r.RequestURI)
+		}
+
+		_, _ = w.Write(con)
+	})
+
 	return f.startHandler(mux)
 }
 

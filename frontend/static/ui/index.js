@@ -147,7 +147,7 @@ webix.ready(function () {
             } else {
                 autoUpdate();
             }
-        }, 5000);
+        }, 1000);
     };
 
     fromTimestamp.attachEvent("onChange", function (value) {
