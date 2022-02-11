@@ -17,7 +17,15 @@ webix.ready(function () {
                     {view: "text", id: "message", width: 300},
                     {view: "checkbox", id: "follow", label: "Follow", value: true, width: 100},
                     {view: "button", id: "prevPage", value: "<<", width: 50},
-                    {view: "button", id: "nextPage", value: ">>", width: 50}
+                    {view: "button", id: "nextPage", value: ">>", width: 50},
+                    {view: "select", id:"level", width: 150, labelAlign:"right",
+                        label: "Level", value:6, options:[
+                            {id: 7, value: "debug"},
+                            {id: 6, value: "info"},
+                            {id: 5, value: "notice"},
+                            {id: 4, value: "warn"},
+                            {id: 3, value: "error"}
+                        ]}
                 ]
             },
             {
@@ -27,7 +35,7 @@ webix.ready(function () {
                         id: "queryStat",
                         //autoConfig: true,
                         columns: [
-                            {id: "Hostname", header: "Hostname", width: 150},
+                            {id: "Hostname", header: "Hostname", maxWidth: 150},
                             {id: "Application", header: "Application", width: 150},
                             {id: "Count", header: "Count", fillspace: true}
                         ],
@@ -71,13 +79,16 @@ webix.ready(function () {
     var nextPage = $$("nextPage");
     var queryStat = $$("queryStat");
     var queryList = $$("queryList");
+    var level = $$("level");
 
     var queryStatRequest = {
-        Limit: 500
+        Limit: 500,
+        Level: parseInt(level.getValue())
     };
 
     var queryListRequest = {
-        Limit: 50
+        Limit: 50,
+        Level: parseInt(level.getValue())
     };
 
     var autoUpdateEnabled = true;
@@ -168,6 +179,12 @@ webix.ready(function () {
         updateStat();
     });
 
+    level.attachEvent("onChange", function (value) {
+        queryStatRequest.Level = queryListRequest.Level = parseInt(value);
+        queryListRequest.Offset = 0;
+        updateList();
+    });
+
     follow.attachEvent("onChange", function (value) {
         autoUpdateEnabled = value;
         if (value === true) {
@@ -207,6 +224,7 @@ webix.ready(function () {
             if (stat) {
                 queryListRequest.Hostname = stat.Hostname !== "*" ? stat.Hostname : null;
                 queryListRequest.Application = stat.Application !== "*" ? stat.Application : null;
+                queryListRequest.Level = parseInt(level.getValue())
             }
         }
         queryListRequest.Offset = 0;

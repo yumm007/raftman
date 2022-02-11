@@ -280,6 +280,10 @@ func (b *sqliteBackend) handleQueryStat(m *queryStatM) {
 	sqlBuf := &bytes.Buffer{}
 	fmt.Fprint(sqlBuf, "SELECT h.host, h.app, COUNT(b.docid) ")
 	b.buildQueryFromAndWhere(m.req, sqlBuf, &args)
+
+	fmt.Fprint(sqlBuf, "and b.level <= ? ")
+	args = append(args, m.req.Level)
+
 	fmt.Fprint(sqlBuf, "GROUP BY h.host, h.app ")
 	fmt.Fprint(sqlBuf, "ORDER BY h.host, h.app ")
 	b.buildQueryLimit(m.req, sqlBuf, &args)
@@ -331,6 +335,8 @@ func (b *sqliteBackend) handleQueryList(m *queryListM) {
 	sqlBuf := &bytes.Buffer{}
 	fmt.Fprint(sqlBuf, "SELECT h.ts, h.host, h.app, b.level, b.msg ")
 	b.buildQueryFromAndWhere(m.req, sqlBuf, &args)
+	fmt.Fprint(sqlBuf, "and b.level <= ? ")
+	args = append(args, m.req.Level)
 	fmt.Fprint(sqlBuf, "ORDER BY h.ts DESC ")
 	b.buildQueryLimit(m.req, sqlBuf, &args)
 

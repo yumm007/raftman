@@ -18,6 +18,7 @@ type QueryRequest struct {
 	Hostname      string
 	Application   string
 	Message       string
+	Level         int
 	Limit         int
 	Offset        int
 }
