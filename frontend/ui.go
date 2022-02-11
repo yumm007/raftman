@@ -21,7 +21,7 @@ func newUIFrontend(e spi.LogEngine, frontendURL *url.URL) (*uiFrontend, error) {
 	return &f, nil
 }
 
-//go:embed static/ui static/ui/index.html
+//go:embed static/ui static/fonts
 var content embed.FS
 
 func (f *uiFrontend) Start() error {
@@ -32,6 +32,7 @@ func (f *uiFrontend) Start() error {
 	mux.HandleFunc(f.path+"api/list", f.api.handleList)
 
 	mux.Handle("/static/ui/", http.FileServer(http.FS(content)))
+	mux.Handle("/static/fonts/", http.FileServer(http.FS(content)))
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		var con []uint8
 		if r.RequestURI == "/" {
