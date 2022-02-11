@@ -51,6 +51,7 @@ webix.ready(function () {
                             {id: "Timestamp", header: "Timestamp", width: 175, format: tsFormatter},
                             {id: "Hostname", header: "Hostname", width: 150},
                             {id: "Application", header: "Application", width: 150},
+                            {id: "DocID", header: "DocID", width: 50},
                             {id: "Level", header: "Level", width: 50},
                             {id: "Message", header: "Message", fillspace: true}
                         ],

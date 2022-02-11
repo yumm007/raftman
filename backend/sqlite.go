@@ -333,7 +333,7 @@ func (b *sqliteBackend) handleQueryList(m *queryListM) {
 	args := []interface{}{}
 
 	sqlBuf := &bytes.Buffer{}
-	fmt.Fprint(sqlBuf, "SELECT h.ts, h.host, h.app, b.level, b.msg ")
+	fmt.Fprint(sqlBuf, "SELECT h.ts, h.host, h.app, b.docid, b.level, b.msg ")
 	b.buildQueryFromAndWhere(m.req, sqlBuf, &args)
 	fmt.Fprint(sqlBuf, "and b.level <= ? ")
 	args = append(args, m.req.Level)
@@ -353,7 +353,8 @@ func (b *sqliteBackend) handleQueryList(m *queryListM) {
 	entries := make([]*api.LogEntry, 0, clamp(0, m.req.Limit, 500))
 	for rows.Next() {
 		entry := api.LogEntry{}
-		err = rows.Scan(&entry.Timestamp, &entry.Hostname, &entry.Application, &entry.Level, &entry.Message)
+		err = rows.Scan(&entry.Timestamp, &entry.Hostname, &entry.Application,
+			&entry.DocID, &entry.Level, &entry.Message)
 		if err != nil {
 			res.Error = err.Error()
 			m.res <- &res
